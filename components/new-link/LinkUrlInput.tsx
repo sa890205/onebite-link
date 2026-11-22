@@ -1,7 +1,7 @@
 export default function LinkUrlInput() {
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor="url" className="text-sm font-medium">
+      <label htmlFor="url" className="text-sm font-medium text-[var(--text)]">
         링크
       </label>
       <input
@@ -10,7 +10,7 @@ export default function LinkUrlInput() {
         type="url"
         required
         placeholder="https://example.com"
-        className="h-10 rounded-lg border border-zinc-300 bg-transparent px-3 text-sm outline-none focus:border-foreground dark:border-zinc-700"
+        className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-base text-[var(--text)] outline-none focus:border-[var(--accent)]"
       />
     </div>
   );

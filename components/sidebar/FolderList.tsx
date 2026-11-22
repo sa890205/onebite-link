@@ -10,7 +10,7 @@ export default function FolderList({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <h2 className="px-3 pb-1 text-xs font-semibold uppercase text-zinc-400">
+      <h2 className="px-3 pb-1 text-xs font-semibold text-[var(--text-sub)]">
         폴더
       </h2>
       <ul className="flex flex-col gap-1">

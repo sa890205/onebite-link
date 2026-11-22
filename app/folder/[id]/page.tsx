@@ -14,7 +14,7 @@ export default async function FolderPage({ params }: PageProps<"/folder/[id]">) 
 
   return (
     <AppShell activeFolderId={folder.id}>
-      <h1 className="mb-6 text-xl font-bold">{folder.name}</h1>
+      <h1 className="mb-8 text-[30px] font-bold leading-[1.2]">{folder.name}</h1>
       <LinkGrid links={links.filter((l) => l.folderId === folder.id)} />
     </AppShell>
   );

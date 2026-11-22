@@ -20,7 +20,7 @@ export default function AppShell({ children, allActive = false, activeFolderId }
           allActive={allActive}
           activeFolderId={activeFolderId}
         />
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 px-6 pb-10 pt-10"><div className="mx-auto max-w-[720px]">{children}</div></main>
       </div>
     </div>
   );

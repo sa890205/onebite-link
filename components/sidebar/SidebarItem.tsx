@@ -12,15 +12,15 @@ export default function SidebarItem({ href, label, count, active = false }: Prop
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
+      className={`flex items-center justify-between rounded-md px-3 py-2 text-sm ${
         active
-          ? "bg-zinc-100 font-semibold dark:bg-zinc-800"
-          : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
+          ? "bg-[var(--hover-bg)] font-semibold text-[var(--text)]"
+          : "item-hover text-[var(--text)]"
       }`}
     >
       <span>{label}</span>
       {count !== undefined && (
-        <span className="text-xs text-zinc-400">{count}</span>
+        <span className="text-xs text-[var(--text-sub)]">{count}</span>
       )}
     </Link>
   );

@@ -14,7 +14,7 @@ export default function NewLinkForm({ folders }: { folders: Folder[] }) {
       <FolderSelect folders={folders} />
       <button
         type="submit"
-        className="h-10 rounded-lg bg-foreground text-sm font-medium text-background transition-opacity hover:opacity-80"
+        className="btn-primary rounded-md bg-[var(--accent)] px-4 py-2 text-sm text-white"
       >
         저장
       </button>
