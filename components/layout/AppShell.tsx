@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { folders, links } from "@/lib/mock-data";
+import { links } from "@/lib/mock-data";
 import Sidebar from "@/components/sidebar/Sidebar";
 import Header from "./Header";
 
@@ -15,7 +15,6 @@ export default function AppShell({ children, allActive = false, activeFolderId }
       <Header />
       <div className="flex flex-1">
         <Sidebar
-          folders={folders}
           totalCount={links.length}
           allActive={allActive}
           activeFolderId={activeFolderId}

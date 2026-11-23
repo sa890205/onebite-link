@@ -1,10 +1,11 @@
 "use client";
 
-import type { Folder } from "@/lib/types";
+import { useFolders } from "@/components/folders/FolderProvider";
 import FolderSelect from "./FolderSelect";
 import LinkUrlInput from "./LinkUrlInput";
 
-export default function NewLinkForm({ folders }: { folders: Folder[] }) {
+export default function NewLinkForm() {
+  const { folders } = useFolders();
   return (
     <form
       onSubmit={(e) => e.preventDefault()}
