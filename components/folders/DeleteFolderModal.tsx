@@ -3,12 +3,20 @@
 import { useEffect } from "react";
 
 type Props = {
+  title?: string;
+  label?: string;
   folderName: string;
   onCancel: () => void;
   onConfirm: () => void;
 };
 
-export default function DeleteFolderModal({ folderName, onCancel, onConfirm }: Props) {
+export default function DeleteFolderModal({
+  title = "폴더 삭제",
+  label = "폴더",
+  folderName,
+  onCancel,
+  onConfirm,
+}: Props) {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onCancel();
@@ -30,10 +38,10 @@ export default function DeleteFolderModal({ folderName, onCancel, onConfirm }: P
         className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-6 shadow-xl"
       >
         <h2 id="delete-folder-title" className="text-lg font-semibold text-[var(--text)]">
-          폴더 삭제
+          {title}
         </h2>
         <p className="text-sm text-[var(--text)]">
-          <strong>{folderName}</strong> 폴더를 정말 삭제할까요?
+          <strong>{folderName}</strong> {label}를 정말 삭제할까요?
         </p>
         <div className="flex justify-end gap-2">
           <button

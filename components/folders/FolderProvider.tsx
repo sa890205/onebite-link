@@ -10,6 +10,7 @@ type FolderContextValue = {
   folders: Folder[];
   links: LinkItem[];
   addLink: (link: LinkItem) => void;
+  requestDeleteLink: (link: LinkItem) => void;
   deletedIds: string[];
   openNewFolderModal: () => void;
   requestDeleteFolder: (folder: Folder) => void;
@@ -38,6 +39,15 @@ export default function FolderProvider({
   const [folders, setFolders] = useState<Folder[]>(initialFolders);
   const [links, setLinks] = useState<LinkItem[]>(initialLinks);
   const addLink = useCallback((link: LinkItem) => setLinks((prev) => [link, ...prev]), []);
+  const [linkDeleteTarget, setLinkDeleteTarget] = useState<LinkItem | null>(null);
+  const requestDeleteLink = useCallback((link: LinkItem) => setLinkDeleteTarget(link), []);
+  const closeLinkDeleteModal = useCallback(() => setLinkDeleteTarget(null), []);
+  function deleteLink() {
+    if (!linkDeleteTarget) return;
+    const { id } = linkDeleteTarget;
+    setLinks((prev) => prev.filter((l) => l.id !== id));
+    setLinkDeleteTarget(null);
+  }
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Folder | null>(null);
@@ -73,7 +83,7 @@ export default function FolderProvider({
 
   return (
     <FolderContext
-      value={{ folders, links, addLink, deletedIds, openNewFolderModal, requestDeleteFolder, requestEditFolder }}
+      value={{ folders, links, addLink, requestDeleteLink, deletedIds, openNewFolderModal, requestDeleteFolder, requestEditFolder }}
     >
       {children}
       {open && (
@@ -91,6 +101,15 @@ export default function FolderProvider({
           existingNames={folders.filter((f) => f.id !== editTarget.id).map((f) => f.name)}
           onCancel={closeEditModal}
           onSave={renameFolder}
+        />
+      )}
+      {linkDeleteTarget && (
+        <DeleteFolderModal
+          title="링크 삭제"
+          label="링크"
+          folderName={linkDeleteTarget.title}
+          onCancel={closeLinkDeleteModal}
+          onConfirm={deleteLink}
         />
       )}
       {deleteTarget && (
