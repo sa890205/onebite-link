@@ -1,6 +1,7 @@
 import type { LinkItem } from "@/lib/types";
 import LinkCard from "./LinkCard";
 import LinkDeleteButton from "./LinkDeleteButton";
+import LinkEditButton from "./LinkEditButton";
 
 export default function LinkGrid({ links }: { links: LinkItem[] }) {
   if (links.length === 0) {
@@ -18,6 +19,7 @@ export default function LinkGrid({ links }: { links: LinkItem[] }) {
           <div className="flex w-full flex-col [&>a]:flex-1">
             <LinkCard link={link} />
           </div>
+          <LinkEditButton link={link} />
           <LinkDeleteButton link={link} />
         </li>
       ))}

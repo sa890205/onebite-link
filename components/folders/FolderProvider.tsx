@@ -5,12 +5,14 @@ import { usePathname, useRouter } from "next/navigation";
 import type { Folder, LinkItem } from "@/lib/types";
 import NewFolderModal from "./NewFolderModal";
 import DeleteFolderModal from "./DeleteFolderModal";
+import EditLinkModal from "@/components/links/EditLinkModal";
 
 type FolderContextValue = {
   folders: Folder[];
   links: LinkItem[];
   addLink: (link: LinkItem) => void;
   requestDeleteLink: (link: LinkItem) => void;
+  requestEditLink: (link: LinkItem) => void;
   deletedIds: string[];
   openNewFolderModal: () => void;
   requestDeleteFolder: (folder: Folder) => void;
@@ -48,6 +50,15 @@ export default function FolderProvider({
     setLinks((prev) => prev.filter((l) => l.id !== id));
     setLinkDeleteTarget(null);
   }
+  const [linkEditTarget, setLinkEditTarget] = useState<LinkItem | null>(null);
+  const requestEditLink = useCallback((link: LinkItem) => setLinkEditTarget(link), []);
+  const closeLinkEditModal = useCallback(() => setLinkEditTarget(null), []);
+  function updateLink(values: { folderId: string; title: string; description: string }) {
+    if (!linkEditTarget) return;
+    const { id } = linkEditTarget;
+    setLinks((prev) => prev.map((l) => (l.id === id ? { ...l, ...values } : l)));
+    setLinkEditTarget(null);
+  }
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Folder | null>(null);
@@ -83,7 +94,7 @@ export default function FolderProvider({
 
   return (
     <FolderContext
-      value={{ folders, links, addLink, requestDeleteLink, deletedIds, openNewFolderModal, requestDeleteFolder, requestEditFolder }}
+      value={{ folders, links, addLink, requestDeleteLink, requestEditLink, deletedIds, openNewFolderModal, requestDeleteFolder, requestEditFolder }}
     >
       {children}
       {open && (
@@ -101,6 +112,15 @@ export default function FolderProvider({
           existingNames={folders.filter((f) => f.id !== editTarget.id).map((f) => f.name)}
           onCancel={closeEditModal}
           onSave={renameFolder}
+        />
+      )}
+      {linkEditTarget && (
+        <EditLinkModal
+          key={linkEditTarget.id}
+          link={linkEditTarget}
+          folders={folders}
+          onCancel={closeLinkEditModal}
+          onSave={updateLink}
         />
       )}
       {linkDeleteTarget && (
