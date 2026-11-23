@@ -1,11 +1,10 @@
 import AppShell from "@/components/layout/AppShell";
-import LinkGrid from "@/components/links/LinkGrid";
-import { links } from "@/lib/mock-data";
+import AllLinks from "@/components/links/AllLinks";
 
 export default function Home() {
   return (
     <AppShell allActive>
-      <LinkGrid links={links} />
+      <AllLinks />
     </AppShell>
   );
 }

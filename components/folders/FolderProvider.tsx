@@ -2,12 +2,14 @@
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import type { Folder } from "@/lib/types";
+import type { Folder, LinkItem } from "@/lib/types";
 import NewFolderModal from "./NewFolderModal";
 import DeleteFolderModal from "./DeleteFolderModal";
 
 type FolderContextValue = {
   folders: Folder[];
+  links: LinkItem[];
+  addLink: (link: LinkItem) => void;
   deletedIds: string[];
   openNewFolderModal: () => void;
   requestDeleteFolder: (folder: Folder) => void;
@@ -24,14 +26,18 @@ export function useFolders() {
 
 export default function FolderProvider({
   initialFolders,
+  initialLinks,
   children,
 }: {
   initialFolders: Folder[];
+  initialLinks: LinkItem[];
   children: ReactNode;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const [folders, setFolders] = useState<Folder[]>(initialFolders);
+  const [links, setLinks] = useState<LinkItem[]>(initialLinks);
+  const addLink = useCallback((link: LinkItem) => setLinks((prev) => [link, ...prev]), []);
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Folder | null>(null);
@@ -67,7 +73,7 @@ export default function FolderProvider({
 
   return (
     <FolderContext
-      value={{ folders, deletedIds, openNewFolderModal, requestDeleteFolder, requestEditFolder }}
+      value={{ folders, links, addLink, deletedIds, openNewFolderModal, requestDeleteFolder, requestEditFolder }}
     >
       {children}
       {open && (

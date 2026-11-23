@@ -9,6 +9,7 @@ export type LinkItem = {
   title: string;
   description: string;
   url: string;
+  thumbnail?: string;
   folderId: string;
   createdAt: string;
 };
