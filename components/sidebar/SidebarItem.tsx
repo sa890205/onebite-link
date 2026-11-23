@@ -20,7 +20,7 @@ export default function SidebarItem({ href, label, count, active = false }: Prop
     >
       <span>{label}</span>
       {count !== undefined && (
-        <span className="text-xs text-[var(--text-sub)]">{count}</span>
+        <span className="text-xs text-[var(--text-sub)] group-hover:invisible">{count}</span>
       )}
     </Link>
   );

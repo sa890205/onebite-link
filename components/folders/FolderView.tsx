@@ -6,9 +6,12 @@ import LinkGrid from "@/components/links/LinkGrid";
 import type { LinkItem } from "@/lib/types";
 
 export default function FolderView({ folderId, links }: { folderId: string; links: LinkItem[] }) {
-  const { folders } = useFolders();
+  const { folders, deletedIds } = useFolders();
   const folder = folders.find((f) => f.id === folderId);
-  if (!folder) notFound();
+  if (!folder) {
+    if (deletedIds.includes(folderId)) return null;
+    notFound();
+  }
 
   return (
     <>
