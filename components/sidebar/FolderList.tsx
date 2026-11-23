@@ -11,7 +11,7 @@ export default function FolderList({
   folders: Folder[];
   activeFolderId?: string;
 }) {
-  const { requestDeleteFolder } = useFolders();
+  const { requestDeleteFolder, requestEditFolder } = useFolders();
 
   return (
     <div className="flex flex-col gap-1">
@@ -27,6 +27,17 @@ export default function FolderList({
               label={folder.name}
               count={folder.count}
             />
+            <button
+              type="button"
+              aria-label={`${folder.name} 폴더 이름 수정`}
+              onClick={() => requestEditFolder(folder)}
+              className="absolute right-8 top-1/2 -translate-y-1/2 rounded p-1 text-[var(--text-sub)] opacity-0 hover:text-[var(--accent)] focus-visible:opacity-100 group-hover:opacity-100"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+              </svg>
+            </button>
             <button
               type="button"
               aria-label={`${folder.name} 폴더 삭제`}

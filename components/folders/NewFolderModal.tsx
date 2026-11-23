@@ -3,18 +3,26 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
 type Props = {
+  title?: string;
+  initialName?: string;
   existingNames: string[];
   onCancel: () => void;
   onSave: (name: string) => void;
 };
 
-export default function NewFolderModal({ existingNames, onCancel, onSave }: Props) {
-  const [name, setName] = useState("");
+export default function NewFolderModal({
+  title = "새 폴더",
+  initialName = "",
+  existingNames,
+  onCancel,
+  onSave,
+}: Props) {
+  const [name, setName] = useState(initialName);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    inputRef.current?.focus();
+    inputRef.current?.select();
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onCancel();
     }
@@ -50,7 +58,7 @@ export default function NewFolderModal({ existingNames, onCancel, onSave }: Prop
         className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-6 shadow-xl"
       >
         <h2 id="new-folder-title" className="text-lg font-semibold text-[var(--text)]">
-          새 폴더
+          {title}
         </h2>
         <div className="flex flex-col gap-2">
           <label htmlFor="folder-name" className="text-sm font-medium text-[var(--text)]">

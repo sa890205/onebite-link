@@ -11,6 +11,7 @@ type FolderContextValue = {
   deletedIds: string[];
   openNewFolderModal: () => void;
   requestDeleteFolder: (folder: Folder) => void;
+  requestEditFolder: (folder: Folder) => void;
 };
 
 const FolderContext = createContext<FolderContextValue | null>(null);
@@ -38,11 +39,21 @@ export default function FolderProvider({
   const openNewFolderModal = useCallback(() => setOpen(true), []);
   const closeModal = useCallback(() => setOpen(false), []);
   const requestDeleteFolder = useCallback((folder: Folder) => setDeleteTarget(folder), []);
+  const [editTarget, setEditTarget] = useState<Folder | null>(null);
+  const requestEditFolder = useCallback((folder: Folder) => setEditTarget(folder), []);
+  const closeEditModal = useCallback(() => setEditTarget(null), []);
   const closeDeleteModal = useCallback(() => setDeleteTarget(null), []);
 
   function addFolder(name: string) {
     setFolders((prev) => [...prev, { id: `folder-${Date.now()}`, name, count: 0 }]);
     setOpen(false);
+  }
+
+  function renameFolder(name: string) {
+    if (!editTarget) return;
+    const { id } = editTarget;
+    setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
+    setEditTarget(null);
   }
 
   function deleteFolder() {
@@ -56,7 +67,7 @@ export default function FolderProvider({
 
   return (
     <FolderContext
-      value={{ folders, deletedIds, openNewFolderModal, requestDeleteFolder }}
+      value={{ folders, deletedIds, openNewFolderModal, requestDeleteFolder, requestEditFolder }}
     >
       {children}
       {open && (
@@ -64,6 +75,16 @@ export default function FolderProvider({
           existingNames={folders.map((f) => f.name)}
           onCancel={closeModal}
           onSave={addFolder}
+        />
+      )}
+      {editTarget && (
+        <NewFolderModal
+          key={editTarget.id}
+          title="폴더 이름 수정"
+          initialName={editTarget.name}
+          existingNames={folders.filter((f) => f.id !== editTarget.id).map((f) => f.name)}
+          onCancel={closeEditModal}
+          onSave={renameFolder}
         />
       )}
       {deleteTarget && (
