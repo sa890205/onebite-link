@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   title?: string;
   label?: string;
   folderName: string;
   onCancel: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
 };
 
 export default function DeleteFolderModal({
@@ -17,18 +17,41 @@ export default function DeleteFolderModal({
   onCancel,
   onConfirm,
 }: Props) {
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+  const deletingRef = useRef(false);
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onCancel();
+      if (e.key === "Escape" && !deletingRef.current) onCancel();
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onCancel]);
 
+  function handleCancel() {
+    if (!deletingRef.current) onCancel();
+  }
+
+  async function handleConfirm() {
+    if (deletingRef.current) return;
+    deletingRef.current = true;
+    setDeleting(true);
+    setError("");
+    try {
+      await onConfirm();
+    } catch {
+      setError("삭제하지 못했습니다. 다시 시도해주세요.");
+    } finally {
+      deletingRef.current = false;
+      setDeleting(false);
+    }
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-      onClick={onCancel}
+      onClick={handleCancel}
     >
       <div
         role="alertdialog"
@@ -43,21 +66,24 @@ export default function DeleteFolderModal({
         <p className="text-sm text-[var(--text)]">
           <strong>{folderName}</strong> {label}를 정말 삭제할까요?
         </p>
+        {error && <p className="text-xs text-[var(--error)]">{error}</p>}
         <div className="flex justify-end gap-2">
           <button
             type="button"
             autoFocus
-            onClick={onCancel}
-            className="item-hover rounded-md border border-[var(--border)] px-4 py-2 text-sm text-[var(--text)]"
+            onClick={handleCancel}
+            disabled={deleting}
+            className="item-hover rounded-md border border-[var(--border)] px-4 py-2 text-sm text-[var(--text)] disabled:opacity-60"
           >
             취소
           </button>
           <button
             type="button"
-            onClick={onConfirm}
-            className="rounded-md bg-[var(--error)] px-4 py-2 text-sm text-white hover:opacity-90"
+            onClick={handleConfirm}
+            disabled={deleting}
+            className="rounded-md bg-[var(--error)] px-4 py-2 text-sm text-white hover:opacity-90 disabled:opacity-60"
           >
-            삭제
+            {deleting ? "삭제 중..." : "삭제"}
           </button>
         </div>
       </div>

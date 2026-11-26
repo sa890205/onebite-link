@@ -98,9 +98,16 @@ export default function FolderProvider({
     setEditTarget(null);
   }
 
-  function deleteFolder() {
+  async function deleteFolder() {
     if (!deleteTarget) return;
     const { id } = deleteTarget;
+    const { error } = await createClient()
+      .from("folders")
+      .delete()
+      .eq("id", id)
+      .select("id")
+      .single();
+    if (error) throw error;
     setFolders((prev) => prev.filter((f) => f.id !== id));
     setDeletedIds((prev) => [...prev, id]);
     setDeleteTarget(null);
