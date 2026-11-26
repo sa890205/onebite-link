@@ -13,3 +13,5 @@ export type LinkItem = {
   folderId: string;
   createdAt: string;
 };
+
+export type NewLink = Omit<LinkItem, "id" | "createdAt">;

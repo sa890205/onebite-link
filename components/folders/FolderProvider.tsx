@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import type { Folder, LinkItem } from "@/lib/types";
+import type { Folder, LinkItem, NewLink } from "@/lib/types";
+import { LINK_COLUMNS, toLinkItem } from "@/lib/links";
 import { createClient } from "@/utils/supabase/client";
 import NewFolderModal from "./NewFolderModal";
 import DeleteFolderModal from "./DeleteFolderModal";
@@ -11,7 +12,7 @@ import EditLinkModal from "@/components/links/EditLinkModal";
 type FolderContextValue = {
   folders: Folder[];
   links: LinkItem[];
-  addLink: (link: LinkItem) => void;
+  addLink: (link: NewLink) => Promise<void>;
   requestDeleteLink: (link: LinkItem) => void;
   requestEditLink: (link: LinkItem) => void;
   deletedIds: string[];
@@ -41,7 +42,21 @@ export default function FolderProvider({
   const pathname = usePathname();
   const [folders, setFolders] = useState<Folder[]>(initialFolders);
   const [links, setLinks] = useState<LinkItem[]>(initialLinks);
-  const addLink = useCallback((link: LinkItem) => setLinks((prev) => [link, ...prev]), []);
+  const addLink = useCallback(async (link: NewLink) => {
+    const { data, error } = await createClient()
+      .from("links")
+      .insert({
+        url: link.url,
+        title: link.title,
+        description: link.description,
+        thumbnail_url: link.thumbnail ?? null,
+        folder_id: Number(link.folderId),
+      })
+      .select(LINK_COLUMNS)
+      .single();
+    if (error) throw new Error("링크를 저장하지 못했습니다.");
+    setLinks((prev) => [toLinkItem(data), ...prev]);
+  }, []);
   const [linkDeleteTarget, setLinkDeleteTarget] = useState<LinkItem | null>(null);
   const requestDeleteLink = useCallback((link: LinkItem) => setLinkDeleteTarget(link), []);
   const closeLinkDeleteModal = useCallback(() => setLinkDeleteTarget(null), []);
