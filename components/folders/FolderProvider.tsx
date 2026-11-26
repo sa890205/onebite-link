@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { Folder, LinkItem } from "@/lib/types";
+import { createClient } from "@/utils/supabase/client";
 import NewFolderModal from "./NewFolderModal";
 import DeleteFolderModal from "./DeleteFolderModal";
 import EditLinkModal from "@/components/links/EditLinkModal";
@@ -71,15 +72,29 @@ export default function FolderProvider({
   const closeEditModal = useCallback(() => setEditTarget(null), []);
   const closeDeleteModal = useCallback(() => setDeleteTarget(null), []);
 
-  function addFolder(name: string) {
-    setFolders((prev) => [...prev, { id: `folder-${Date.now()}`, name, count: 0 }]);
+  async function addFolder(name: string) {
+    const { data, error } = await createClient()
+      .from("folders")
+      .insert({ name })
+      .select("id, name")
+      .single();
+    if (error) throw error;
+    setFolders((prev) => [...prev, { id: String(data.id), name: data.name, count: 0 }]);
     setOpen(false);
   }
 
-  function renameFolder(name: string) {
+  async function renameFolder(name: string) {
     if (!editTarget) return;
     const { id } = editTarget;
-    setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name } : f)));
+    // single()은 수정된 행이 없으면 오류를 반환한다
+    const { data, error } = await createClient()
+      .from("folders")
+      .update({ name })
+      .eq("id", id)
+      .select("name")
+      .single();
+    if (error) throw error;
+    setFolders((prev) => prev.map((f) => (f.id === id ? { ...f, name: data.name } : f)));
     setEditTarget(null);
   }
 

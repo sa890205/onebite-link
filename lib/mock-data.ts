@@ -1,11 +1,4 @@
-import type { Folder, LinkItem } from "./types";
-
-export const folders: Folder[] = [
-  { id: "dev", name: "개발", count: 4 },
-  { id: "design", name: "디자인", count: 3 },
-  { id: "reading", name: "읽을거리", count: 2 },
-  { id: "etc", name: "기타", count: 1 },
-];
+import type { LinkItem } from "./types";
 
 export const links: LinkItem[] = [
   { id: "1", title: "Next.js 공식 문서", description: "App Router, 서버 컴포넌트, 캐싱 가이드를 확인할 수 있는 공식 문서", url: "https://nextjs.org/docs", folderId: "dev", createdAt: "2026-11-20" },

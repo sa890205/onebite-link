@@ -7,7 +7,7 @@ type Props = {
   initialName?: string;
   existingNames: string[];
   onCancel: () => void;
-  onSave: (name: string) => void;
+  onSave: (name: string) => void | Promise<void>;
 };
 
 export default function NewFolderModal({
@@ -19,19 +19,31 @@ export default function NewFolderModal({
 }: Props) {
   const [name, setName] = useState(initialName);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  // state가 화면에 반영되기 전의 연속 제출까지 막기 위한 플래그
+  const savingRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     inputRef.current?.select();
+  }, []);
+
+  useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onCancel();
+      if (e.key === "Escape" && !savingRef.current) onCancel();
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onCancel]);
 
-  function handleSubmit(e: FormEvent) {
+  // 저장 중에 닫고 다시 열어 중복 추가하는 것을 막는다
+  function handleCancel() {
+    if (!savingRef.current) onCancel();
+  }
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (savingRef.current) return;
     const trimmed = name.trim();
     if (!trimmed) {
       setError("폴더 이름을 입력해주세요.");
@@ -41,13 +53,22 @@ export default function NewFolderModal({
       setError("이미 존재하는 폴더 이름입니다.");
       return;
     }
-    onSave(trimmed);
+    savingRef.current = true;
+    setSaving(true);
+    try {
+      await onSave(trimmed);
+    } catch {
+      setError("폴더를 저장하지 못했습니다. 다시 시도해주세요.");
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
   }
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-      onClick={onCancel}
+      onClick={handleCancel}
     >
       <form
         role="dialog"
@@ -68,6 +89,7 @@ export default function NewFolderModal({
             ref={inputRef}
             id="folder-name"
             value={name}
+            readOnly={saving}
             onChange={(e) => {
               setName(e.target.value);
               setError("");
@@ -80,16 +102,18 @@ export default function NewFolderModal({
         <div className="flex justify-end gap-2">
           <button
             type="button"
-            onClick={onCancel}
-            className="item-hover rounded-md border border-[var(--border)] px-4 py-2 text-sm text-[var(--text)]"
+            onClick={handleCancel}
+            disabled={saving}
+            className="item-hover rounded-md border border-[var(--border)] px-4 py-2 text-sm text-[var(--text)] disabled:opacity-60"
           >
             취소
           </button>
           <button
             type="submit"
-            className="btn-primary rounded-md bg-[var(--accent)] px-4 py-2 text-sm text-white"
+            disabled={saving}
+            className="btn-primary rounded-md bg-[var(--accent)] px-4 py-2 text-sm text-white disabled:opacity-60"
           >
-            저장
+            {saving ? "저장 중..." : "저장"}
           </button>
         </div>
       </form>
