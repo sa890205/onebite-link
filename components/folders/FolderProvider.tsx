@@ -60,9 +60,16 @@ export default function FolderProvider({
   const [linkDeleteTarget, setLinkDeleteTarget] = useState<LinkItem | null>(null);
   const requestDeleteLink = useCallback((link: LinkItem) => setLinkDeleteTarget(link), []);
   const closeLinkDeleteModal = useCallback(() => setLinkDeleteTarget(null), []);
-  function deleteLink() {
+  async function deleteLink() {
     if (!linkDeleteTarget) return;
     const { id } = linkDeleteTarget;
+    const { error } = await createClient()
+      .from("links")
+      .delete()
+      .eq("id", id)
+      .select("id")
+      .single();
+    if (error) throw error;
     setLinks((prev) => prev.filter((l) => l.id !== id));
     setLinkDeleteTarget(null);
   }
