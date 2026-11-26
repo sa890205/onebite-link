@@ -69,10 +69,22 @@ export default function FolderProvider({
   const [linkEditTarget, setLinkEditTarget] = useState<LinkItem | null>(null);
   const requestEditLink = useCallback((link: LinkItem) => setLinkEditTarget(link), []);
   const closeLinkEditModal = useCallback(() => setLinkEditTarget(null), []);
-  function updateLink(values: { folderId: string; title: string; description: string }) {
+  async function updateLink(values: { folderId: string; title: string; description: string }) {
     if (!linkEditTarget) return;
     const { id } = linkEditTarget;
-    setLinks((prev) => prev.map((l) => (l.id === id ? { ...l, ...values } : l)));
+    const { data, error } = await createClient()
+      .from("links")
+      .update({
+        title: values.title,
+        description: values.description,
+        folder_id: values.folderId ? Number(values.folderId) : null,
+      })
+      .eq("id", id)
+      .select(LINK_COLUMNS)
+      .single();
+    if (error) throw error;
+    const updated = toLinkItem(data);
+    setLinks((prev) => prev.map((l) => (l.id === id ? updated : l)));
     setLinkEditTarget(null);
   }
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
