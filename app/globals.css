@@ -41,7 +41,7 @@ body {
   background: var(--hover-bg);
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
 }
 
